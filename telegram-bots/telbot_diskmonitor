@@ -1,0 +1,46 @@
+import psutil
+from telegram import Bot, Update
+from telegram.ext import Updater, CommandHandler, CallbackContext
+
+# Replace 'YOUR_TOKEN' with your actual Telegram bot token
+TOKEN = 'YOUR_TOKEN'
+
+# Function to get current disk usage
+def get_disk_usage():
+    disk = psutil.disk_usage('/')
+    total = round(disk.total / (1024 ** 3), 2)  # Convert bytes to GB
+    used = round(disk.used / (1024 ** 3), 2)
+    free = round(disk.free / (1024 ** 3), 2)
+    return f"Total: {total} GB\nUsed: {used} GB\nFree: {free} GB"
+
+# Function to send disk usage to Telegram
+def disk_usage(update: Update, context: CallbackContext):
+    chat_id = update.message.chat_id
+    usage = get_disk_usage()
+    context.bot.send_message(chat_id=chat_id, text=f"Disk Usage:\n{usage}")
+
+# Function to get current CPU usage
+def get_cpu_usage():
+    cpu_percent = psutil.cpu_percent(interval=1)
+    return f"CPU Usage: {cpu_percent}%"
+
+# Function to send CPU usage to Telegram
+def cpu_usage(update: Update, context: CallbackContext):
+    chat_id = update.message.chat_id
+    usage = get_cpu_usage()
+    context.bot.send_message(chat_id=chat_id, text=usage)
+
+# Main function to start the bot
+def main():
+    updater = Updater(TOKEN, use_context=True)
+
+    # Register handlers
+    updater.dispatcher.add_handler(CommandHandler('disk', disk_usage))
+    updater.dispatcher.add_handler(CommandHandler('cpu', cpu_usage))
+
+    # Start the Bot
+    updater.start_polling()
+    updater.idle()
+
+if __name__ == '__main__':
+    main()

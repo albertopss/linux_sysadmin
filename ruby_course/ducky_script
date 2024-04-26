@@ -1,0 +1,10 @@
+REM Sart a ruby server
+DELAY 2000
+ALT F3
+DELAY 2000
+STRING termi
+ENTER
+DELAY 2000
+STRING ruby /run /e httpd ./p 8080
+DELAY 2000
+ENTER

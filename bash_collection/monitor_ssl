@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Set the path to the directory where your SSL certificates are stored
+CERT_DIR="/etc/ssl/certs"
+
+# Loop through all files in the CERT_DIR directory
+for cert in $CERT_DIR/*; do
+    # Check if the file is a certificate file
+    if [ -f "$cert" ]; then
+        # Get the expiration date of the certificate
+        expiration_date=$(openssl x509 -noout -enddate -in "$cert" | awk -F= '{print $2}')
+        
+        # Convert the expiration date to a timestamp
+        expiration_timestamp=$(date -d "$expiration_date" +%s)
+        
+        # Get the current timestamp
+        current_timestamp=$(date +%s)
+        
+        # Calculate the number of days until the certificate expires
+        days_until_expiration=$((($expiration_timestamp - $current_timestamp) / 86400))
+        
+        # Check if the certificate will expire in less than 30 days
+        if [ $days_until_expiration -lt 30 ]; then
+            echo "Certificate $cert will expire in $days_until_expiration days"
+            
+            # You can add additional actions here, such as sending an email notification or renewing the certificate
+            
+        fi
+        
+    fi
+    
+done

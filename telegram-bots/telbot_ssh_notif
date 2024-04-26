@@ -1,0 +1,32 @@
+import re
+import subprocess
+from telegram import Bot
+
+# Replace 'YOUR_TOKEN' with your actual Telegram bot token
+TOKEN = 'YOUR_TOKEN'
+
+# Function to parse auth.log and get failed SSH login attempts
+def get_failed_ssh_attempts():
+    auth_log = subprocess.check_output(['tail', '-n', '50', '/var/log/auth.log']).decode('utf-8')
+    failed_attempts = re.findall(r'Failed password for (?:invalid user )?(.*?) from (.*?) port', auth_log)
+    return failed_attempts
+
+# Function to send notification to Telegram
+def send_notification(message):
+    bot = Bot(token=TOKEN)
+    bot.send_message(chat_id='YOUR_CHAT_ID', text=message)
+
+# Main function to monitor failed SSH login attempts and send notifications
+def main():
+    while True:
+        failed_attempts = get_failed_ssh_attempts()
+        if failed_attempts:
+            message = "Failed SSH login attempts:\n"
+            for username, ip in failed_attempts:
+                message += f"Username: {username}, IP: {ip}\n"
+            send_notification(message)
+        # Adjust the sleep time according to your needs
+        time.sleep(60)
+
+if __name__ == '__main__':
+    main()

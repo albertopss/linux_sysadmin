@@ -1,0 +1,22 @@
+sudo virt-install \
+--name=my_vm_name \
+--ram=2048 \
+--vcpus=2 \
+--disk path=/var/lib/libvirt/images/my_vm_disk.qcow2,size=20 \
+--os-type linux \
+--os-variant ubuntu20.04 \
+--network bridge=virbr0 \
+--graphics none \
+--console pty,target_type=serial \
+--location=/path/to/iso/or/network/location \
+--extra-args='console=ttyS0'
+
+Replace my_vm_name with the desired name for your virtual machine.
+Adjust --ram and --vcpus to specify the amount of RAM and number of virtual CPUs for the virtual machine.
+Set the --disk option to specify the path and size of the disk image for the virtual machine. Adjust the size as needed.
+Specify the --os-type and --os-variant options according to the operating system you're installing. In this example, it's set for Ubuntu 20.04.
+Adjust the --network option to specify the network configuration. In this example, it's using a bridge named virbr0.
+Set --graphics none to disable graphical display.
+Use --console pty,target_type=serial to redirect console output to serial.
+Specify the --location option to point to the installation media (ISO file or network location).
+Optionally, you can pass additional kernel parameters via --extra-args.

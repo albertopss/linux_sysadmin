@@ -1,0 +1,53 @@
+To configure rsyslog server on Ubuntu to receive and sort remote log messages, follow these steps:
+
+1. Install rsyslog on the Ubuntu server if it is not already installed:
+`
+sudo apt-get update
+sudo apt-get install rsyslog
+`
+
+2. Edit the rsyslog configuration file to enable receiving remote log messages:
+`
+sudo nano /etc/rsyslog.conf
+`
+
+Uncomment the following lines by removing the "#" at the beginning of each line:
+`
+# provides UDP syslog reception
+module(load="imudp")
+input(type="imudp" port="514")
+
+# provides TCP syslog reception
+module(load="imtcp")
+input(type="imtcp" port="514")
+`
+
+3. Save and close the file.
+
+4. Restart the rsyslog service to apply the changes:
+`
+sudo systemctl restart rsyslog
+`
+
+5. Configure firewall rules to allow incoming log messages on port 514 (UDP and TCP).
+
+6. To sort incoming log messages into separate log files based on their source, create a new configuration file in /etc/rsyslog.d/ directory:
+`
+sudo nano /etc/rsyslog.d/remote.conf
+`
+
+Add the following lines to sort logs from a specific IP address into a separate log file:
+`
+if $fromhost-ip == 'REMOTE_IP_ADDRESS' then /var/log/remote.log
+& stop
+`
+Replace REMOTE_IP_ADDRESS with the IP address of the remote server sending logs.
+
+7. Save and close the file.
+
+8. Restart the rsyslog service again to apply the new configuration:
+`
+sudo systemctl restart rsyslog
+`
+
+Now, your rsyslog server on Ubuntu should be configured to receive and sort remote log messages from specified sources into separate log files.

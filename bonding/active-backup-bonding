@@ -1,0 +1,26 @@
+sudo apt-get install network-manager
+sudo nano /etc/network/interfaces
+#Configure Bonding Interface: Add a new section for your bonding interface. Below is an example configuration for bonding two WiFi interfaces (wlan0 and wlan1) and one Ethernet interface (eth0) in active-backup mode:
+auto bond0
+iface bond0 inet manual
+    bond-mode 1
+    bond-primary eth0
+    bond-miimon 100
+    bond-downdelay 200
+    bond-updelay 200
+
+auto wlan0
+iface wlan0 inet manual
+    bond-master bond0
+    bond-primary wlan0
+
+auto wlan1
+iface wlan1 inet manual
+    bond-master bond0
+
+#Restart networkmanager
+sudo systemctl restart NetworkManager
+
+#Verify Configuration
+cat /proc/net/bonding/bond0
+

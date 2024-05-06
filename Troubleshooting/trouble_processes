@@ -1,0 +1,35 @@
+1. Diagnose and Identify Processes:
+ps aux             # Display all processes
+ps aux | grep <keyword>    # Filter processes by keyword
+pgrep apache2
+lsof: The lsof command lists open files and the processes associated with them:
+
+lsof -i: Displays processes using internet connections.
+lsof /path/to/file: Lists processes accessing a specific file.
+
+netstat: The netstat command provides information about network connections,
+ routing tables, and network interfaces.
+
+monitor del sistema (GUI)
+
+2. Manage Processes:
+kill <PID>        # Terminate a process by PID
+killall <process_name>    # Terminate all processes with a specific name
+pkil (send signals based on name)
+
+3. Diagnose and Identify Services:
+systemctl status <service_name>    # Check the status of a service
+systemctl start <service_name>     # Start a service
+systemctl stop <service_name>      # Stop a service
+systemctl restart <service_name>   # Restart a service
+
+4. Troubleshoot Processes and Services:
+Logs: Check logs for errors and warnings related to processes and services. Common log files include:
+/var/log/syslog
+/var/log/messages
+/var/log/<service_name>.log
+
+journalctl -xe             # View recent system logs
+journalctl -u <service_name>     # View logs for a specific service
+
+5.- Web app COCKPIT

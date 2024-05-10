@@ -1,1 +1,1 @@
-Essential linux script for sys admin
+Essential linux scripts for sys admin

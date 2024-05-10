@@ -65,3 +65,6 @@ sudo iptables -A OUTPUT -p tcp --sport 3306 -m conntrack --ctstate ESTABLISHED -
 sudo iptables -A INPUT -i eth1 -p tcp --dport 3306 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
 sudo iptables -A OUTPUT -o eth1 -p tcp --sport 3306 -m conntrack --ctstate ESTABLISHED -j ACCEPT
 
+#Port 6002 should only be accessible from IP 192.168.10.80
+iptables -A INPUT -i eth0 -p tcp --dport 6000 -s 192.168.1.112 -j ACCEPT
+iptables -A INPUT -i eth0 -p tcp --dport 6000 -j DROP

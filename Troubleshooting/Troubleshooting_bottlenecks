@@ -1,0 +1,30 @@
+#Check processes
+htop
+bpytop
+ps aux | grep "processes"
+top -b "id_processes"
+
+#Check I/O statistics
+iotop -oP
+vmstat
+systat
+dstat
+htop
+
+#Check memory
+df -h
+lsblk
+free
+
+#Network activity
+iftop
+nload(bandwidth)
+nethogs(Bandwidth per process)
+
+#List of system calls made by a process
+strace command
+
+#Kill de the processes
+kill -9 "id_processes"
+
+#Umount or remove

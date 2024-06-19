@@ -1,0 +1,39 @@
+Setting up a load balancer with HAProxy involves configuring HAProxy 
+to distribute incoming traffic across multiple backend servers.
+#Install HAproxy
+#Edit the HAProxy configuration file (/etc/haproxy/haproxy.cfg
+#Example basic configuration
+global
+    log /dev/log local0
+    log /dev/log local1 notice
+    chroot /var/lib/haproxy
+    stats socket /run/haproxy/admin.sock mode 660 level admin
+    stats timeout 30s
+    user haproxy
+    group haproxy
+    daemon
+
+defaults
+    log global
+    mode http
+    option httplog
+    option dontlognull
+    timeout connect 5000
+    timeout client 50000
+    timeout server 50000
+
+frontend load_balancer
+    bind *:80
+    default_backend app_servers
+
+backend app_servers
+    balance roundrobin
+    server server1 192.168.1.101:80 check
+    server server2 192.168.1.102:80 check
+    server server3 192.168.1.103:80 check
+
+#Check syntax errors:
+sudo haproxy -c -f /etc/haproxy/haproxy.cfg
+#Restart service
+#Review HAProxy logs (/var/log/haproxy.log) for troubleshooting and monitoring.
+#Security: Consider firewall rules and SSL termination if needed (HAProxy can handle SSL termination as well)

@@ -1,0 +1,193 @@
+###############################Linux SysAdmin basic conf.################################
+-----------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+###NTP###
+
+-Use ntpd to manually review the time offset and decide whether or not to adjust
+-the system time:
+
+#ntpdate 2.mx.pool.ntp.org
+
+-or you can set ntp auto with systemd-timedatectl/ntpd
+
+#edit /etc/systemd/timesyncd.conf
+
+-Use timedatectl for adjust timezone,ntp or info
+-Use localectl for layout config
+
+-------------------------------------------------------------------------------------------
+#Compression
+	tar -czvf logs_archive.tar.gz * --remove (This example create a archive and 
+			compress them using gzip with that name and remove original files)
+	Check tar --help and gzip --help for more info
+	
+	Search for a string in an archive using the below command
+		 zgrep -Hna 'string-to-search' compressedFile.tar.gz
+
+----------------------------------------------------------------------------------------
+###Build from source
+-cd /path/to/dir : ./configure --prefix=<installation_path> (specifies where the software 
+				will be installed. By default, it installs in /usr/local 
+	     make
+	     sudo make install
+	     #Remember to understand the specific instructions for that software. 
+	     			it's essential to read any accompanying documentation
+	     			 (often found in README or INSTALL files)
+
+--------------------------------------------------------------------------------------------
+###git
+-For gitOps:
+	git clone
+	git pull
+	git add /path
+	git commit -m "Message"
+	git branch new_branch
+	git branch --list
+	git checkout new_branch
+	git add .
+	git commit -m
+	git push
+	git stash
+	git stash pop
+	git checkout main
+	git merge new_branch 
+
+-------------------------------------------------------------------------------------------
+###Docker
+-Docker cheat sheet
+	docker pull <image:version>
+	docker run  <image>(Example: docker run -d --name frontend --memory 30m
+  			     -p 1234:80 nginx:alpine)more info type docker run --help
+	docker image ls
+	docker container ls
+
+-Build a docker image with a Dockerfile:
+	Get or make the Dockerfile 	
+	docker build -t httpd-image . (For control version use docker image 
+					tag --help)
+	docker run -d  80:80 httpd-image
+	docker ps
+	docker stop
+	docker rmi -f
+-Running Docker containers automatically can be achieved using several methods depending on your specific needs and environment. 
+	docker run --restart always <image>
+	docker run --restart unless-stopped <image>
+	docker run --restart on-failure <image>
+	You can use docker compose,swarm,sytemd,kubernetes)
+
+-Delete all containers:
+	docker container prune
+
+--------------------------------------------------------------------------------------------	
+###ip forward
+	sysctl -a | grep ip_forward
+           --persistent--nano /etc/sysctl.conf
+	systctl -p 
+           --no-persistent sysctl -w net.ipv4.ip_forward=1
+	sysctl -p
+
+---------------------------------------------------------------------------------------------
+###libvirt
+	sudo apt list --installed | grep libvirt
+	
+
+---------------------------------------------------------------------------------------------
+###ssh
+-Install openssh and enable the service
+-sshd server
+-Configure for global, groups or specific users
+		vim /etc/ssh/sshd_config.d/user.conf
+
+-SSH client tools:
+	.ssh/
+	ssh -v user@server
+	rsync -avl user@server:/path/to/dest /file/to/be/shared (This command can be tremendous
+				savings of network bandwidth)
+	  or
+	rsync -avl --delete user@server:/path/to/dest /file (This will be mirror local and remote)
+        sftp ---help
+	ssh-keygen -t <type-key>
+	ssh-copy-id -i /path/to/key	
+	Check apropiate permissions on server and client.
+	Change passwdauthentication and rootlogin to NO
+
+
+
+---------------------------------------------------------------------------------------------
+###Users & Groups
+-useradd --help
+	useradd -m -d /home/user -s /bin/zsh -G sudo -c "New User"  user
+-usermod --help
+	usermod -a -G --Grupo secundario
+	usermod -a -g --grupo primario
+	usermod -e YY-MM-DD 
+-deluser --help
+	Delete user with perl script
+	
+-groupadd, delgroup
+-change shell with chsh or /etc/passwd (not recomended)	
+-Setting user defaults:
+	edit /etc/login.defs & /etc/default/useradd 
+
+#Managing users in the enterprise with LDAP servers or Microsoft Active Directories
+---------------------------------------------------------------------------------------------
+###Configuring OpenLDAP with SSL for Secure Directory Access on Ubuntu 22.04
+	sudo apt update sudo apt install slapd ldap-utils
+	sudo dpkg-reconfigure slapd 
+	sudo ufw allow 389
+	sudo ufw allow 636
+	sudo ufw reload
+	
+
+----------------------------------------------------------------------------------------------
+###lvm
+
+
+
+
+	
+----------------------------------------------------------------------------------------------
+###processes 
+	I/O demand
+  	top -d | grep 
+	ps aux | grep 
+	systat
+	iostat
+	iotop -oP
+	df -h
+	du -h
+	lsof 
+
+----------------------------------------------------------------------------------------------
+###cronjob for other users
+	With sudo privilegies: sudo crontab -u "user"
+	
+   global cronjob from root file(not recomended)
+   	edit /etc/crontab (remember the conf is different from crontab for users)
+   		
+----------------------------------------------------------------------------------------------
+###iptables
+	iptables -A INPUT -
+	iptables -A PREROUTING -t nat  -i eth0 -p tcp --dport 8080 -s 192.168.1.98 -j REDIRECT --to-port 80
+	iptables.save > /etc/iptables/rules.V4 with iptables-persistent
+
+----------------------------------------------------------------------------------------------
+###filesystem manage
+	The absolute path of a partition is where they are  mounted
+	lsblk
+	df -h /path/to/partition
+
+----------------------------------------------------------------------------------------------
+###memory issues
+
+
+----------------------------------------------------------------------------------------------
+###nfs 
+
+
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-----------------------------------------------------------------------------------------
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+################Always check systemctl status & restart/reload##########################	

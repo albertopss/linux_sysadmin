@@ -141,42 +141,91 @@
 
 ----------------------------------------------------------------------------------------------
 ###lvm
+-Identify Disk ----- [dmesg -w] [journalctl --help] [df -h] 
+-Create Physical Volume:
+	sudo pvs 
+	sudo pvdisplay /dev/sdx
+-Create Volume Group
+	sudo vgcreate vg_name /dev/sdx
+-Confirm
+	sudo vgs
+	sudo vgdisplay vg_name ----- Info for specific volume
+-Create Logical Volume
+	sudo lvcreate -L size -n lv_name vg_name
+        Example:
+		sudo lvcreate -L 10G -n virtual_disk virtual_group
+-Create File System
+	sudo mkfs.ext4 /dev/mapper/vg_name-lv-name
+-Mount Logical Volume
+	sudo lvdisplay
+	sudo mkdir /mnt/mylv
+	sudo mount /dev/mapper/vg_name-lv_name /mnt/mylv
+	#Automount on Boot: Add an entry to /etc/fstab  you can use blkid for
+			identify UUID
 
-
-
-
+-Resize Logical Volume: 
+	sudo lvresize -L +size /dev/vg_name/lv_name   # Extend LV
+	sudo lvresize -L -size /dev/vg_name/lv_name   # Shrink LV
+	#Some distros needs run resize2fs
+Additional Tips:
+Backup: Always backup your data before resizing or modifying logical volumes.
+Monitoring: Use tools like lvdisplay, pvdisplay, and vgdisplay to monitor volume
+	 usage and health.
+Snapshots: LVM supports snapshots (lvcreate -s) for creating point-in-time
+ copies of logical volumes.
 	
 ----------------------------------------------------------------------------------------------
-###processes 
-	I/O demand
-  	top -d | grep 
-	ps aux | grep 
-	systat
-	iostat
-	iotop -oP
-	df -h
-	du -h
-	lsof 
+##################Processes 
+	htop, top, bpytop, cockpit, etc...
+	Identify PID : Example: top -d 20 
+	top -b | grep PID
+	ps aux | grep sshd ---Find running processes related to specific service 
+	systat-------monitoring system resources, performance, and use 
+	iostat-------provides a snapshot of CPU and disk I/O usage at specified intervals
+	iotop -oP ---Show I/O statistics in real time & which processes are the most demanding
+	df -h--------monitoring disk space usage, determining where storage is allocated, and
+                      identifying potential issues with disk space shortages.
+	du -h--------It shows how much disk space is being used by files and directories within
+		      a specified directory or set of directories
+	lsof---------identify which processes are using specific files or network connections,
+		List Files Opened by a Specific Process: lsof -p 1234
+		List Processes Opening a Specific File: lsof /path/to/file.txt
+		List Files Opened by a Specific User:lsof -u username
+		lsof --help
+	
 
 ----------------------------------------------------------------------------------------------
-###cronjob for other users
+#########Cronjobs
 	With sudo privilegies: sudo crontab -u "user"
 	
-   global cronjob from root file(not recomended)
+        global cronjob from root file(not recomended)
    	edit /etc/crontab (remember the conf is different from crontab for users)
    		
 ----------------------------------------------------------------------------------------------
-###iptables
-	iptables -A INPUT -
-	iptables -A PREROUTING -t nat  -i eth0 -p tcp --dport 8080 -s 192.168.1.98 -j REDIRECT --to-port 80
+###iptables, examples:
+	
+	iptables -A INPUT -i eth0 -j DROP #Block all in traffic
+	iptables -A PREROUTING -t nat  -i eth0 -p tcp --dport 8080 -s 192.168.1.98 -j REDIRECT --to	   -port 80 #to redirect web traffic from a specific client to a different port or service run			ning locally on the server
+	iptables -A INPUT -i eth0 -p tcp --dport 8080 -j DROP #Block all input traffic
+	iptables -A OUTPUT -p tcp -d 192.168.1.X/XX -j DROP
+	sudo apt install iptables-persistent	
 	iptables.save > /etc/iptables/rules.V4 with iptables-persistent
 
-----------------------------------------------------------------------------------------------
-###filesystem manage
-	The absolute path of a partition is where they are  mounted
-	lsblk
-	df -h /path/to/partition
 
+---------------------------------------------------------------------------------------------
+###filesystem manage
+The absolute path of a partition is where they are  mounted
+	lsblk-------focuses on block devices and their relationships (parent devices, partitions).
+	df -h------- helps in monitoring filesystem usage, determining available space, and 
+		     managing disk storage.
+  	fsck--------File System Integrity Check:sudo fsck /dev/sdb
+		    Repair File System Errors:sudo fsck -y /dev/sdb
+		    Recover Data:e2fsck, xfs_repair, etc
+	parted /dev/sdx 'print' :Show the partitions os specific disk
+	parted-------to create, resize, and manage partitions
+		     sudo parted /dev/sda
+		     (parted) print
+		
 ----------------------------------------------------------------------------------------------
 ###memory issues
 

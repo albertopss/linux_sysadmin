@@ -1,0 +1,17 @@
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eno1: {}
+    wlx00c0cab2eeb5: {}
+  bonds:
+    bond0:
+      dhcp4: yes
+      interfaces:
+        - eno1
+        - wlx00c0cab2eeb5
+        parameters:
+          mode: active-backup
+          primary: eno1
+	  downdelay: 200
+	  updelay: 200

@@ -88,7 +88,7 @@
 
 ---------------------------------------------------------------------------------------------
 ###libvirt
-	sudo apt list --installed | grep libvirt
+	#Check Virtual Machines
 	
 
 ---------------------------------------------------------------------------------------------
@@ -206,7 +206,7 @@ Snapshots: LVM supports snapshots (lvcreate -s) for creating point-in-time
 	
 	iptables -A INPUT -i eth0 -j DROP #Block all in traffic
 	iptables -A PREROUTING -t nat  -i eth0 -p tcp --dport 8080 -s 192.168.1.98 -j REDIRECT --to	   -port 80 #to redirect web traffic from a specific client to a different port or service run			ning locally on the server
-	iptables -A INPUT -i eth0 -p tcp --dport 8080 -j DROP #Block all input traffic
+	iptables -A INPUT -i eth0 -p tcp --dport 8080 -j DROP #Block all input traffic only the rules added before can be read
 	iptables -A OUTPUT -p tcp -d 192.168.1.X/XX -j DROP
 	sudo apt install iptables-persistent	
 	iptables.save > /etc/iptables/rules.V4 with iptables-persistent
@@ -225,15 +225,49 @@ The absolute path of a partition is where they are  mounted
 	parted-------to create, resize, and manage partitions
 		     sudo parted /dev/sda
 		     (parted) print
-		
+	             mkfs
+	             mount the file system
+
+*More info check Troubleshooting filesystem issues
+
 ----------------------------------------------------------------------------------------------
-###memory issues
-
+###memory 
+	free -h -------to check the overall memory usage, including total, used, and free memory. It also shows swap usage if applicable.
+	du -sh /path/to/directory -----identify if any directory is using an unexpectedly large amount of space.
+	df -h --------Check disk space
+	sudo fsck /dev/sdXY------checks and repairs inconsistencies in the filesystem.(unmounted the filesytem before)
+	sudo e2fsck -f /dev/sdXY-----For ext2, ext3, or ext4 filesystems, use e2fsck to check and repair the filesystem. 
+	sudo smartctl -a /dev/sdX------it provides information about the health of the device and potential issues.
+	mount | grep " / " --------specific mounted filesystems to ensure they are appropriate include permissions.
+	sudo dmesg | grep -i error ---------check for any hardware-related disk errors reported by the system. These might indicate failing hardware that needs replacement.
+	
+*General Tips:
+Backup Data: Before making any significant changes or repairs to the filesystem, ensure you have a backup of important data to prevent potential data loss.
+Use Live CD/USB: For critical filesystem repairs on the root filesystem, boot into a live CD/USB environment to perform checks and repairs safely.
 
 ----------------------------------------------------------------------------------------------
-###nfs 
+###nfs & sshfs
+	sudo apt update
+	sudo apt install nfs-kernel-server
+	sudo mkdir /shared
+	sudo nano /etc/exports
+	#Edit	/shared  192.168.1.X/XX(rw,sync,no_subtree_check)
+	sudo exportfs -a
+	sudo systemctl status nnfs.server
+	sudo systemctl restart nfs-server
+	#Configure firewall
 
+-Client side
+	sudo apt update
+	sudo apt install nfs-common
+	sudo mkdir -p /mnt/nfs
+	sudo mount <server_IP>:/shared /mnt/nfs
+	#Verify dh -h
+	#Automount  edit /etc/fstab : <server_IP>:/shared /mnt/nfs nfs defaults 0 0
+	
 
+###SSHFS
+	sudo sshfs -o allow_other,default_permissions sammy@your_other_server:~/ /mnt/droplet
 
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

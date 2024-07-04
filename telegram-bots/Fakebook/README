@@ -1,0 +1,2 @@
+docker build -t facebook-interface .
+docker run -d -p 8080:80 facebook-interface

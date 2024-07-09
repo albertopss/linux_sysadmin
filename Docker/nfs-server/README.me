@@ -1,0 +1,29 @@
+In this Dockerfile:
+
+----Base Image: It starts with the latest Ubuntu image (ubuntu:latest), which is a common choice for Docker
+ containers due to its widespread support and compatibility.
+
+-----Package Installation: It installs nfs-kernel-server using apt-get. This package provides the NFS server
+ functionality.
+
+-----Shared Directory: It creates a directory /sharedfolder inside the container.
+ This is the directory that will be shared via NFS.
+
+-----Configuration: The COPY exports /etc/exports line copies an exports file into the container's /etc/exports directory.
+ This file contains the configuration for NFS exports, specifying which directories to share and which hosts have access.
+
+-----Exposing Ports: The EXPOSE 2049/tcp line exposes port 2049, which is the default port used by NFS.
+
+----CMD Instructions: These lines specify the commands to start various NFS server components
+ (rpcbind, rpc.mountd, exportfs, and rpc.nfsd). Each CMD instruction specifies a command to be run when the container starts. 
+Note that in a Dockerfile, only the last CMD instruction is effective, so this setup might need adjustments depending on your specific
+ requirements and environment.
+
+---Building and running:
+docker build -t nfs-server .
+docker run --privileged --network=host --rm -it nfs-server
+	[--privileged: This option gives the container additional privileges needed for NFS to work properly.
+	--network=host: This option makes the container use the host's network stack, which is often necessary for NFS to function correctly.
+	--rm: This option automatically removes the container when it exits.
+	-it: These options run the container interactively, allowing you to see the NFS server's output logs.]
+

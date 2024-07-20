@@ -58,19 +58,20 @@ DML(Data Manipulation Language)
 Basic Operations: DML primarily includes four basic operations: INSERT, UPDATE, DELETE, and SELECT.
 
 INSERT: Adds new rows of data into a table.
+			INSERT INTO users(user_name, passwd) VALUES('Shreck','test') WHERE user_id = 9 ;
+
 UPDATE: Modifies existing data within a table.
+
+			UPDATE users SET user_name = 'Homero' WHERE user_name = 'Sreck' AND password = 'test';
+			UPDATE account SET last_login = created_on
+
 DELETE: Removes existing data from a table.
+			
+			DELETE FROM users WHERE user_name = 'Homero' RETURNING username,password;			
+			
 SELECT: Retrieves data from one or more tables based on specified criteria.
 
+			SELECT * FROM users;
+			SELECT user_name FROM users WHERE user_id = 9;
+			
 ##########################################################################################
-DDL(Data Definition Language)
-s a set of SQL commands used to create, modify, and delete database structures but not data. These commands are normally not used by a general user, who should be accessing the database via an application.
-
-CREATE: Used to create new database objects like tables, views, indexes, etc.
-ALTER: Modifies the structure of existing database objects.
-DROP: Deletes database objects like tables, views, indexes, etc.
-TRUNCATE: Removes all data from a table but keeps the table structure intact.
-RENAME: Changes the name of a database object.
-
-##########################################################################################
-

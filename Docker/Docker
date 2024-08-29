@@ -1,0 +1,15 @@
+#Pull a image
+docker pull nginx
+
+#Run the Docker Container
+docker run -d -p 8080:80 --name mynginx nginx
+
+#Check
+docker ps
+
+#Stop and remove
+docker stop <container_name_or_id>
+
+docker rm <container_name_or_id>
+
+

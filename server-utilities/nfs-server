@@ -1,0 +1,47 @@
+#!/bin/bash
+
+set -e
+
+# Variables
+EXPORT_DIR="/srv/nfs/shared"
+NETWORK_CIDR="192.168.1.0/24"  # Replace with your network
+SELINUX_LABEL="public_content_rw_t"
+
+# Update system and install NFS utilities
+echo "Installing NFS server packages..."
+dnf install -y nfs-utils
+
+# Enable and start NFS server
+echo "Enabling and starting NFS services..."
+systemctl enable --now nfs-server nfs-mountd rpcbind 
+
+# Create export directory
+echo "Creating NFS export directory at $EXPORT_DIR..."
+mkdir -p "$EXPORT_DIR"
+chown nfsnobody:nfsnobody "$EXPORT_DIR"
+chmod 755 "$EXPORT_DIR"
+
+# Configure SELinux context
+echo "Setting SELinux context..."
+semanage fcontext -a -t $SELINUX_LABEL "${EXPORT_DIR}(/.*)?"
+restorecon -Rv "$EXPORT_DIR"
+
+# Add export entry
+echo "Configuring /etc/exports..."
+echo "$EXPORT_DIR $NETWORK_CIDR(rw,sync,no_root_squash)" >> /etc/exports
+
+# Apply export changes
+exportfs -rav
+
+# Configure firewall
+echo "Configuring firewalld..."
+firewall-cmd --permanent --add-service=nfs --zone=public
+firewall-cmd --permanent --add-service=rpc-bind --zone=public
+firewall-cmd --permanent --add-service=mountd --zone=public
+firewall-cmd --reload
+
+# Ensure SELinux boolean is set
+echo "Configuring SELinux booleans..."
+setsebool -P nfs_export_all_rw on
+
+echo "NFS server setup complete!"

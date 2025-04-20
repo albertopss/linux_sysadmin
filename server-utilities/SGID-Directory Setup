@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# CONFIGURE THIS
+GROUP="devteam"
+DIR="/srv/devteam"
+USERS=("alice" "bob" "charlie")  # replace with your actual usernames
+
+echo "Creating group: $GROUP"
+sudo groupadd -f $GROUP
+
+echo "Adding users to group..."
+for user in "${USERS[@]}"; do
+    sudo usermod -aG $GROUP "$user"
+done
+
+echo "Creating shared directory: $DIR"
+sudo mkdir -p "$DIR"
+
+# Set SELinux context for collaborative dir
+echo "Configuring SELinux context for $DIR..."
+sudo semanage fcontext -a -t public_content_rw_t "$DIR(/.*)?"
+sudo restorecon -Rv "$DIR"
+
+#Check setsebool If you're going to allow services or scripts to access this directory (like Apache, Samba,FTP)
+#Fro example sudo setsebool -P httpd_unified 1
+
+
+echo "Setting group ownership and SGID bit..."
+sudo chown :$GROUP "$DIR"
+sudo chmod 2775 "$DIR"
+
+echo "Setting default ACLs..."
+sudo setfacl -d -m g::rwx "$DIR"
+sudo setfacl -d -m o::rx "$DIR"
+
+echo "✅ Setup complete."
+ls -ld "$DIR"

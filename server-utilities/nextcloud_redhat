@@ -1,0 +1,80 @@
+#!/bin/bash
+
+set -e
+
+# === CONFIGURATION ===
+POD_NAME="nextcloud-pod"
+DB_NAME="nextcloud-db"
+NC_NAME="nextcloud"
+PORT=8080
+
+DB_ROOT_PASS="strongpassword"
+DB_USER="nextcloud"
+DB_PASS="nextcloudpass"
+DB_NAME_VAL="nextcloud"
+
+DATA_DIR="$HOME/nextcloud"
+HTML_DIR="$DATA_DIR/html"
+DB_DIR="$DATA_DIR/db"
+SYSTEMD_USER_DIR="$HOME/.config/systemd/user"
+
+# === CREATE DIRECTORIES ===
+mkdir -p "$HTML_DIR" "$DB_DIR"
+
+# === SET SELINUX CONTEXTS ===
+chcon -Rt container_file_t "$HTML_DIR"
+chcon -Rt container_file_t "$DB_DIR"
+
+# === CREATE POD ===
+if ! podman pod exists "$POD_NAME"; then
+  podman pod create --name "$POD_NAME" -p $PORT:80
+fi
+
+# === RUN MARIADB CONTAINER ===
+if ! podman container exists "$DB_NAME"; then
+  podman run -d \
+    --name "$DB_NAME" \
+    --pod "$POD_NAME" \
+    -e MYSQL_ROOT_PASSWORD="$DB_ROOT_PASS" \
+    -e MYSQL_DATABASE="$DB_NAME_VAL" \
+    -e MYSQL_USER="$DB_USER" \
+    -e MYSQL_PASSWORD="$DB_PASS" \
+    -v "$DB_DIR":/var/lib/mysql:Z \
+    docker.io/library/mariadb:10.6
+fi
+
+# === RUN NEXTCLOUD CONTAINER ===
+if ! podman container exists "$NC_NAME"; then
+  podman run -d \
+    --name "$NC_NAME" \
+    --pod "$POD_NAME" \
+    -e MYSQL_HOST=127.0.0.1 \
+    -e MYSQL_DATABASE="$DB_NAME_VAL" \
+    -e MYSQL_USER="$DB_USER" \
+    -e MYSQL_PASSWORD="$DB_PASS" \
+    -v "$HTML_DIR":/var/www/html:Z \
+    docker.io/library/nextcloud
+fi
+
+# === GENERATE SYSTEMD UNIT ===
+mkdir -p "$SYSTEMD_USER_DIR"
+cd "$SYSTEMD_USER_DIR"
+
+# Remove old unit if it exists
+rm -f container-${POD_NAME}.service
+
+cd -
+podman generate systemd --name "$POD_NAME" --files --restart-policy=always
+mv container-${POD_NAME}.service "$SYSTEMD_USER_DIR"
+
+# === ENABLE SYSTEMD SERVICE ===
+systemctl --user daemon-reexec
+systemctl --user daemon-reload
+systemctl --user enable --now container-${POD_NAME}.service
+
+# === ENABLE LINGER FOR BOOT STARTUP ===
+loginctl enable-linger "$USER"
+
+echo "✅ Nextcloud pod setup complete!"
+echo "➡️ Access it at: http://localhost:$PORT"
+

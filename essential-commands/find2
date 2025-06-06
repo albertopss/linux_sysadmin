@@ -1,1 +1,0 @@
-find / -type f -size +10M -name "*.log" -exec rm -f {} \;

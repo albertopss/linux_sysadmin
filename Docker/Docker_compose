@@ -1,8 +1,0 @@
-#Check version
-docker compose version
-
-#Create a directory for the project
-mkdir composetest
-cd composetest
-
-#Create 
